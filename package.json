@@ -1,0 +1,27 @@
+{
+  "name": "dc_music",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/isis1234/dc_music.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/isis1234/dc_music/issues"
+  },
+  "homepage": "https://github.com/isis1234/dc_music#readme",
+  "dependencies": {
+    "@discordjs/opus": "^0.8.0",
+    "discord.js": "^12.5.3",
+    "dotenv": "^16.0.1",
+    "ffmpeg-static": "^5.0.2",
+    "ytdl-core": "^4.11.0"
+  }
+}
