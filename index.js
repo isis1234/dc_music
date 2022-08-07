@@ -12,3 +12,6 @@ require("./init")(bot, BOT_CLIENT_ID, TOKEN)
 
 // Command /ping listener
 require("./ping")(bot, BOT_CLIENT_ID, TOKEN)
+
+// Command /ping listener
+require("./music")(bot, BOT_CLIENT_ID, TOKEN)
