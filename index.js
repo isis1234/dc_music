@@ -1,6 +1,5 @@
 require("dotenv").config()
 const { Client, GatewayIntentBits } = require('discord.js')
-const Music = require("./Music")
 
 const TOKEN = process.env.BOT_TOKEN
 const BOT_CLIENT_ID = process.env.BOT_CLIENT_ID
