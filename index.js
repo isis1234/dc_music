@@ -14,4 +14,19 @@ require("./init")(bot, BOT_CLIENT_ID, TOKEN)
 require("./ping")(bot, BOT_CLIENT_ID, TOKEN)
 
 // Command /ping listener
-require("./music")(bot, BOT_CLIENT_ID, TOKEN)
+// require("./music")(bot, BOT_CLIENT_ID, TOKEN)
+
+bot.on('interactionCreate', async interaction => {
+  if (!interaction.isChatInputCommand()) return
+
+  if (interaction.commandName === 'music') {
+    console.log(interaction.member.voice, "@@@")
+    if(!interaction.guildId){ await interaction.reply('你必須先加入伺服器'); return; }
+    if(!interaction.member.voice.channel){ await interaction.reply('你必須先加入語音頻道'); return; }
+
+    switch(interaction.options._hoistedOptions[0].name){
+      case "queue": await interaction.reply('queue!'); break;
+      default: await interaction.reply('Pong!');
+    }
+  }
+})
