@@ -15,6 +15,7 @@ module.exports = (bot, BOT_CLIENT_ID, BOT_TOKEN) => {
 
       switch(interaction.options._hoistedOptions[0].name){
         case "queue": await require("./queue")(bot, interaction, music); break;
+        case "leave": await require("./leave")(bot, interaction, music); break;
         default: await interaction.reply('Pong!');
       }
     }

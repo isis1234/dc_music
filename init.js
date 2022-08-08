@@ -78,6 +78,12 @@ function command_builder(){
         .setRequired(false)
     })
 
+    //top
+    .addBooleanOption((option) =>{
+      return option.setName('leave')
+        .setDescription("Disconnect voice channel")
+        .setRequired(false)
+    })
   )
   // console.log(cmds[1])
   return cmds

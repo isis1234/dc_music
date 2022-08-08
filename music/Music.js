@@ -21,7 +21,7 @@ module.exports = class Music {
 
   async join(msg) {
     if (msg.member.voice.channel !== null) {
-      const connection = joinVoiceChannel({
+      this.connection[msg.guild.id] = joinVoiceChannel({
         channelId: msg.member.voice.channel.id,
         guildId: msg.member.voice.channel.guild.id,
         adapterCreator: msg.member.voice.channel.guild.voiceAdapterCreator,
@@ -123,17 +123,17 @@ module.exports = class Music {
   }
 
   leave(msg) {
-    // 如果機器人在頻道中
-    if (this.connection[msg.guild.id] && this.connection[msg.guild.id].status === 0) {
+    if (this.connection[msg.guild.id]) {
+    // if (this.connection[msg.guild.id] && this.connection[msg.guild.id].status === 0) {
       // 如果機器人有播放過歌曲
       if (this.queue.hasOwnProperty(msg.guild.id)) {
         delete this.queue[msg.guild.id] // 清空播放列表
         this.isPlaying[msg.guild.id] = false  // 改變 isPlaying 狀態為 false
       }
-
-      this.connection[msg.guild.id].disconnect()  // 離開頻道
+      this.connection[msg.guild.id].destroy()  // 離開頻道
+      return "Left"
     } else {
-      msg.channel.send('機器人未加入任何頻道')
+      return '機器人未加入任何頻道'
     }
   }
 }
