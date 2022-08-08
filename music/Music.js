@@ -23,6 +23,8 @@ module.exports = class Music {
 
     // https://discord.js.org/#/docs/main/stable/class/StreamDispatcher
     this.dispatcher = {}
+
+    this.player = createAudioPlayer()
   }
 
   async join(msg) {
@@ -86,18 +88,17 @@ module.exports = class Music {
 
   playMusic(msg, guildID, musicInfo) {
     msg.channel.send(`播放音樂：${musicInfo.name}`)
-    const player = createAudioPlayer()
+    // const player = createAudioPlayer()
     const resource = createAudioResource(
       ytdl(musicInfo.url, { filter: 'audioonly' }),
       { inlineVolume: true }
     )
-    resource.volume.setVolume(0.5)  // 把音量降 50%
-    player.play(resource)
-    this.dispatcher[guildID] = this.connection[guildID].subscribe(player)
+    this.player.play(resource)
+    this.dispatcher[guildID] = this.connection[guildID].subscribe(this.player)
     this.queue[guildID].shift() // 移除 queue 中目前播放的歌曲
 
     // 歌曲播放結束時的事件
-    player.on('stateChange', (oldState, newState) => {
+    this.player.on('stateChange', (oldState, newState) => {
       //playing -> idle
       console.log(`Audio player transitioned from ${oldState.status} to ${newState.status}`);
       if(oldState.status=="playing" && newState.status=="idle"){
@@ -113,21 +114,23 @@ module.exports = class Music {
 
   resume(msg) {
     if (this.dispatcher[msg.guild.id]) {
-      msg.channel.send('恢復播放');
-      this.dispatcher[msg.guild.id].resume()  // 恢復播放
+      this.player.unpause()  // 恢復播放
+      // this.dispatcher[msg.guild.id].resume()  // 恢復播放
+      return '恢復播放'
     }
   }
 
   pause(msg) {
     if (this.dispatcher[msg.guild.id]) {
-      msg.channel.send('暫停播放')
-      this.dispatcher[msg.guild.id].pause() // 暫停播放
+      this.player.pause() // 暫停播放
+      return '暫停播放'
+      // this.dispatcher[msg.guild.id].pause() // 暫停播放
     }
   }
 
   skip(msg) {
     if (this.dispatcher[msg.guild.id]) {
-      msg.channel.send('跳過目前歌曲')
+      return '跳過目前歌曲'
       this.dispatcher[msg.guild.id].end() // 跳過歌曲
     }
   }
