@@ -87,41 +87,28 @@ module.exports = class Music {
   playMusic(msg, guildID, musicInfo) {
     msg.channel.send(`播放音樂：${musicInfo.name}`)
     const player = createAudioPlayer()
-    const resource = createAudioResource(ytdl(musicInfo.url, { filter: 'audioonly' }))
+    const resource = createAudioResource(
+      ytdl(musicInfo.url, { filter: 'audioonly' }),
+      { inlineVolume: true }
+    )
+    resource.volume.setVolume(0.5)  // 把音量降 50%
     player.play(resource)
     this.dispatcher[guildID] = this.connection[guildID].subscribe(player)
-      // .setVolume(0.5)
+    this.queue[guildID].shift() // 移除 queue 中目前播放的歌曲
 
     // 歌曲播放結束時的事件
-    // this.dispatcher[guildID].on('finish', () => {
-    //   console.log("done")
-    // })
     player.on('stateChange', (oldState, newState) => {
       //playing -> idle
       console.log(`Audio player transitioned from ${oldState.status} to ${newState.status}`);
-    });
-
-
-    //===============
-    // this.connection[guildID].on('ready', () => {
-    //   // "/home/isis1234/Desktop/dc_music/ringtone.mp3"
-    //   console.log('The connection has entered the Ready state - ready to play audio!');
-    //   this.dispatcher[guildID] = this.connection[guildID].subscribe(ytdl(musicInfo.url, { filter: 'audioonly' }))
-    // //   // // this.dispatcher[guildID] = this.connection[guildID].play(ytdl(musicInfo.url, { filter: 'audioonly' }))
-    // //   // this.dispatcher[guildID].setVolume(0.5) // 把音量降 50%
-    // //   // this.queue[guildID].shift() // 移除 queue 中目前播放的歌曲
-    // })
-
-    // 歌曲播放結束時的事件
-    // // this.dispatcher[guildID].on('finish', () => {
-    // //   // 如果隊列中有歌曲
-    // //   if (this.queue[guildID].length > 0) {
-    // //     this.playMusic(msg, guildID, this.queue[guildID][0])
-    // //   } else {
-    // //     this.isPlaying[guildID] = false
-    // //     msg.channel.send('目前沒有音樂了，請加入音樂 :D')
-    // //   }
-    // // })
+      if(oldState.status=="playing" && newState.status=="idle"){
+        if (this.queue[guildID].length > 0) {
+          this.playMusic(msg, guildID, this.queue[guildID][0])
+        } else {
+          this.isPlaying[guildID] = false
+          msg.channel.send('目前沒有音樂了，請加入音樂 :D')
+        }
+      }
+    })
   }
 
   resume(msg) {
