@@ -1,10 +1,11 @@
 require("dotenv").config()
-const { Client, GatewayIntentBits } = require('discord.js')
+const { Client, GatewayIntentBits  } = require('discord.js')
 
 const TOKEN = process.env.BOT_TOKEN
 const BOT_CLIENT_ID = process.env.BOT_CLIENT_ID
 
-const bot = new Client({ intents: [GatewayIntentBits.Guilds] });
+// console.log(GatewayIntentBits)
+const bot = new Client({ intents: [ GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates ] })
 bot.login(TOKEN)
 
 // Init Command
