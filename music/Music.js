@@ -1,3 +1,4 @@
+const { joinVoiceChannel } = require('@discordjs/voice');
 module.exports = class Music {
   constructor() {
     // this.isPlaying = { 724145832802385970: false }
@@ -20,7 +21,12 @@ module.exports = class Music {
 
   async join(msg) {
     if (msg.member.voice.channel !== null) {
-      this.connection[msg.guild.id] = await msg.member.voice.channel.join()
+      const connection = joinVoiceChannel({
+        channelId: msg.member.voice.channel.id,
+        guildId: msg.member.voice.channel.guild.id,
+        adapterCreator: msg.member.voice.channel.guild.voiceAdapterCreator,
+      })
+      // this.connection[msg.guild.id] = await msg.member.voice.channel.join()
     } else {
       msg.channel.send('請先進入語音頻道')
     }
@@ -110,9 +116,9 @@ module.exports = class Music {
     if (this.queue[msg.guild.id] && this.queue[msg.guild.id].length > 0) {
       // 字串處理，將 Object 組成字串
       const queueString = this.queue[msg.guild.id].map((item, index) => `[${index+1}] ${item.name}`).join()
-      msg.channel.send(queueString)
+      return (queueString)
     } else {
-      msg.channel.send('目前隊列中沒有歌曲')
+      return ('目前隊列中沒有歌曲')
     }
   }
 

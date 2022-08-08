@@ -1,3 +1,3 @@
-module.exports = async (bot, interaction, Music) => {
-	await interaction.reply('queue!');
+module.exports = async (bot, interaction, music) => {
+  await interaction.reply(music.nowQueue(interaction))
 }
