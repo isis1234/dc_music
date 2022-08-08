@@ -9,7 +9,8 @@ const bot = new Client({ intents: [ GatewayIntentBits.Guilds, GatewayIntentBits.
 bot.login(TOKEN)
 
 // Init Command
-require("./init")(bot, BOT_CLIENT_ID, TOKEN)
+// require("./init")(bot, BOT_CLIENT_ID, TOKEN)
+console.log("Started")
 
 // Command /ping listener
 require("./ping")(bot, BOT_CLIENT_ID, TOKEN)

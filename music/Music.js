@@ -1,4 +1,10 @@
-const { joinVoiceChannel } = require('@discordjs/voice');
+const { 
+  joinVoiceChannel, VoiceConnectionStatus, entersState, 
+  createAudioPlayer, AudioPlayerStatus, createAudioResource, StreamType
+} = require('@discordjs/voice')
+const ytdl = require('ytdl-core')
+const prism = require('prism-media')
+
 module.exports = class Music {
   constructor() {
     // this.isPlaying = { 724145832802385970: false }
@@ -21,12 +27,20 @@ module.exports = class Music {
 
   async join(msg) {
     if (msg.member.voice.channel !== null) {
-      this.connection[msg.guild.id] = joinVoiceChannel({
-        channelId: msg.member.voice.channel.id,
-        guildId: msg.member.voice.channel.guild.id,
-        adapterCreator: msg.member.voice.channel.guild.voiceAdapterCreator,
-      })
-      // this.connection[msg.guild.id] = await msg.member.voice.channel.join()
+      try {
+        this.connection[msg.guild.id] = joinVoiceChannel({
+          channelId: msg.member.voice.channel.id,
+          guildId: msg.member.voice.channel.guild.id,
+          adapterCreator: msg.member.voice.channel.guild.voiceAdapterCreator,
+          selfMute: false,
+          selfDeaf: false
+        })
+        await entersState(this.connection[msg.guild.id], VoiceConnectionStatus.Ready, 30_000)
+        console.log(`[ ${msg.guild.name} ] 🎙 Voice channel ready.`)
+      } catch (error) {
+        this.connection[msg.guild.id].destroy();
+        throw error;
+      }
     } else {
       msg.channel.send('請先進入語音頻道')
     }
@@ -34,26 +48,25 @@ module.exports = class Music {
 
   async play(msg) {
     const guildID = msg.guild.id
-    const musicURL = msg.content.replace(`${PREFIX}play`, '').trim()
+    const musicURL = msg.options._hoistedOptions[0].value
 
-    if (!this.connection[guildID]) {
-      music.join(msg)
-      // msg.channel.send('請先將機器人 `!!join` 加入頻道')
-      // return
+    // join channel handler
+    // console.log(this.connection[guildID]._state.status)
+    if (!this.connection[guildID]) { this.join(msg) }
+    else if (this.connection[guildID]._state.status == VoiceConnectionStatus.Signalling) { 
+      console.log(`[ ${msg.guild.name} ] 🎙 Voice channel signalling.`)
+      this.join(msg) 
     }
-
-    if (this.connection[guildID].status === 4) {
-      msg.channel.send('請先將機器人 `!!join` 重新加入頻道')
-      return
+    else if (this.connection[guildID]._state.status == VoiceConnectionStatus.Connecting) { 
+      console.log(`[ ${msg.guild.name} ] 🎙 Voice channel connecting.`)
+      this.join(msg) 
     }
 
     try {
       const res = await ytdl.getInfo(musicURL)
       const info = res.videoDetails
 
-      if (!this.queue[guildID]) {
-        this.queue[guildID] = []
-      }
+      if (!this.queue[guildID]) { this.queue[guildID] = [] }
 
       this.queue[guildID].push({
         name: info.title,
@@ -73,21 +86,42 @@ module.exports = class Music {
 
   playMusic(msg, guildID, musicInfo) {
     msg.channel.send(`播放音樂：${musicInfo.name}`)
-
-    this.dispatcher[guildID] = this.connection[guildID].play(ytdl(musicInfo.url, { filter: 'audioonly' }))
-    this.dispatcher[guildID].setVolume(0.5) // 把音量降 50%
-    this.queue[guildID].shift() // 移除 queue 中目前播放的歌曲
+    const player = createAudioPlayer()
+    const resource = createAudioResource(ytdl(musicInfo.url, { filter: 'audioonly' }))
+    player.play(resource)
+    this.dispatcher[guildID] = this.connection[guildID].subscribe(player)
+      // .setVolume(0.5)
 
     // 歌曲播放結束時的事件
-    this.dispatcher[guildID].on('finish', () => {
-      // 如果隊列中有歌曲
-      if (this.queue[guildID].length > 0) {
-        this.playMusic(msg, guildID, this.queue[guildID][0])
-      } else {
-        this.isPlaying[guildID] = false
-        msg.channel.send('目前沒有音樂了，請加入音樂 :D')
-      }
-    })
+    // this.dispatcher[guildID].on('finish', () => {
+    //   console.log("done")
+    // })
+    player.on('stateChange', (oldState, newState) => {
+      //playing -> idle
+      console.log(`Audio player transitioned from ${oldState.status} to ${newState.status}`);
+    });
+
+
+    //===============
+    // this.connection[guildID].on('ready', () => {
+    //   // "/home/isis1234/Desktop/dc_music/ringtone.mp3"
+    //   console.log('The connection has entered the Ready state - ready to play audio!');
+    //   this.dispatcher[guildID] = this.connection[guildID].subscribe(ytdl(musicInfo.url, { filter: 'audioonly' }))
+    // //   // // this.dispatcher[guildID] = this.connection[guildID].play(ytdl(musicInfo.url, { filter: 'audioonly' }))
+    // //   // this.dispatcher[guildID].setVolume(0.5) // 把音量降 50%
+    // //   // this.queue[guildID].shift() // 移除 queue 中目前播放的歌曲
+    // })
+
+    // 歌曲播放結束時的事件
+    // // this.dispatcher[guildID].on('finish', () => {
+    // //   // 如果隊列中有歌曲
+    // //   if (this.queue[guildID].length > 0) {
+    // //     this.playMusic(msg, guildID, this.queue[guildID][0])
+    // //   } else {
+    // //     this.isPlaying[guildID] = false
+    // //     msg.channel.send('目前沒有音樂了，請加入音樂 :D')
+    // //   }
+    // // })
   }
 
   resume(msg) {
@@ -115,7 +149,7 @@ module.exports = class Music {
     // 如果隊列中有歌曲就顯示
     if (this.queue[msg.guild.id] && this.queue[msg.guild.id].length > 0) {
       // 字串處理，將 Object 組成字串
-      const queueString = this.queue[msg.guild.id].map((item, index) => `[${index+1}] ${item.name}`).join()
+      const queueString = this.queue[msg.guild.id].map((item, index) => `[${index+1}] ${item.name}`).join("\n")
       return (queueString)
     } else {
       return ('目前隊列中沒有歌曲')
