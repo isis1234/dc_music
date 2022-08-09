@@ -1,0 +1,36 @@
+/music action: 離開
+	Bye
+/music action: 歌單
+	目前隊列中沒有歌曲
+/music play:https://www.youtube.com/watch?v=JcVGx_LyhdQ
+	播放音樂：the ringtone that everyone forgot about
+/music action: 歌單
+	播放中：the ringtone that everyone forgot about
+	目前隊列中沒有歌曲
+/music play: https://www.youtube.com/watch?v=8fofng_BJsg
+	歌曲加入隊列：send this to someone who owns a samsung phone
+/music action: 歌單
+	播放中：the ringtone that everyone forgot about
+	[1] send this to someone who owns a samsung phone
+
+/music action: 歌單
+	播放中：send this to someone who owns a samsung phone
+	目前隊列中沒有歌曲
+	目前沒有音樂了，請加入音樂 :D
+/music action: 歌單
+	目前隊列中沒有歌曲
+
+/music play:https://www.youtube.com/watch?v=JcVGx_LyhdQ
+/music action: 歌單
+	播放中：the ringtone that everyone forgot about
+	目前隊列中沒有歌曲
+/music play: https://www.youtube.com/watch?v=8fofng_BJsg
+	歌曲加入隊列：send this to someone who owns a samsung phone
+/music action: 歌單
+	播放中：the ringtone that everyone forgot about
+	[1] send this to someone who owns a samsung phone
+/music top: https://www.youtube.com/watch?v=nu2ytVFYdT4
+	插播音樂：musicians when they wipe a window
+/music action: 歌單
+	播放中：musicians when they wipe a window
+	[1] send this to someone who owns a samsung phone

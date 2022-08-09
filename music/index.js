@@ -14,14 +14,14 @@ module.exports = (bot, BOT_CLIENT_ID, BOT_TOKEN) => {
         music.join(interaction)
       }
 
-      switch(interaction.options._hoistedOptions[0].name){
-        case "queue": await require("./queue")(bot, interaction, music); break;
-        case "leave": await require("./leave")(bot, interaction, music); break;
-        case "play": await require("./play")(bot, interaction, music); break;
-        case "skip": await require("./skip")(bot, interaction, music); break;
-        case "pause": await require("./pause")(bot, interaction, music); break;
-        default: await interaction.reply('Pong!');
-      }
+      if(interaction.options._hoistedOptions[0]){
+        switch(interaction.options._hoistedOptions[0].name){
+          case "play": await require("./play")(bot, interaction, music); break;
+          case "top": await require("./top")(bot, interaction, music); break;
+          case "action": await require("./action")(bot, interaction, music); break;
+          default: await interaction.reply('Pong!');
+        }
+      }else{ await interaction.reply('Pong!') }
     }
   })
 }

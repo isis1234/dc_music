@@ -3,7 +3,7 @@ const { SlashCommandBuilder, Routes, REST } = require('discord.js')
 module.exports = (bot, BOT_CLIENT_ID, BOT_TOKEN) => {
   try{
     bot.on("ready", async () => {
-      console.log(`${bot.user.tag} restarted.`)
+      // console.log(`${bot.user.tag} restarted.`)
       const rest = new REST({ version: '10' }).setToken(BOT_TOKEN);
       
       console.log('Started refreshing application (/) commands.')
@@ -43,47 +43,68 @@ function command_builder(){
     //play
     .addStringOption((option) =>{
       return option.setName('play')
-        .setDescription('YouTube url')
+        .setDescription('加入YouTube')
         .setRequired(false)
     })
-    
-    //pause = pause/resume
+
+    //top
     .addStringOption((option) =>{
-      return option.setName('pause')
-        .setDescription('pause/resume?')
+      return option.setName('top')
+        .setDescription('插播YouTube')
+        .setRequired(false)
+    })
+
+    //action
+    .addStringOption((option) =>{
+      return option.setName('action')
+        .setDescription('播放|暫停|下一首|歌單|離開')
         .addChoices(
-          { name: 'pause', value: "pause" },
-          { name: 'resume', value: "resume" },
+          { name: '暫停', value: "pause" },
+          { name: '播放', value: "resume" },
+          { name: '下一首', value: "skip" },
+          { name: '歌單', value: "list" },
+          { name: '離開', value: "leave" },
         )
     })
 
-    //queue
-    .addBooleanOption((option) =>{
-      return option.setName('queue')
-        .setDescription('input anythings')
-        .setRequired(false)
-    })
+    //=====
+    // //play
+    // .addStringOption((option) =>{
+    //   return option.setName('play')
+    //     .setDescription('YouTube url')
+    //     .setRequired(false)
+    // })
+    
+    // //action
+    // .addStringOption((option) =>{
+    //   return option.setName('pause')
+    //     .setDescription('pause/resume?')
+    //     .addChoices(
+    //       { name: 'pause', value: "pause" },
+    //       { name: 'resume', value: "resume" },
+    //     )
+    // })
 
-    //skip
-    .addIntegerOption((option) =>{
-      return option.setName('skip')
-        .setDescription('input queue number')
-        .setRequired(false)
-    })
+    // //queue
+    // .addBooleanOption((option) =>{
+    //   return option.setName('queue')
+    //     .setDescription('input anythings')
+    //     .setRequired(false)
+    // })
 
-    //top
-    .addIntegerOption((option) =>{
-      return option.setName('top')
-        .setDescription('skip 1st and play selected song')
-        .setRequired(false)
-    })
+    // //skip
+    // .addIntegerOption((option) =>{
+    //   return option.setName('skip')
+    //     .setDescription('input queue number')
+    //     .setRequired(false)
+    // })
 
-    //top
-    .addBooleanOption((option) =>{
-      return option.setName('leave')
-        .setDescription("Disconnect voice channel")
-        .setRequired(false)
-    })
+    // //leave
+    // .addBooleanOption((option) =>{
+    //   return option.setName('leave')
+    //     .setDescription("Disconnect voice channel")
+    //     .setRequired(false)
+    // })
   )
   // console.log(cmds[1])
   return cmds
